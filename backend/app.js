@@ -1,23 +1,22 @@
 const express = require("express");
 const app = express();
+
 const mongoose = require("mongoose");
-const Listing = require("./models/listing.js");
 const path = require("path");
 const methodOverride = require("method-override");
-const ExpressError = require("./utils/ExpressError.js")
 const ejsMate = require("ejs-mate");
+const ExpressError = require("./utils/ExpressError");
+const session = require("express-session")
+const flash = require("connect-flash")
+// Routes
+const listingRouter = require("./routes/listing");
+const reviewRouter = require("./routes/review");
 
 const MONGO_URL = "mongodb://127.0.0.1:27017/nestive";
-const { listingSchema } = require("./schema.js");
-const wrapAsync = require("./utils/wrapAsync.js");
 
 main()
-  .then(() => {
-    console.log("connected to DB");
-  })
-  .catch((err) => {
-    console.log(err);
-  });
+  .then(() => console.log("Connected to DB"))
+  .catch((err) => console.log(err));
 
 async function main() {
   await mongoose.connect(MONGO_URL);
@@ -25,86 +24,37 @@ async function main() {
 
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
+
+app.engine("ejs", ejsMate);
+
 app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride("_method"));
 app.use(express.static(path.join(__dirname, "public")));
 
-app.engine("ejs", ejsMate);
-
-
-const validateListing = (req, res, next) => {
-  let { error } = listingSchema.validate(req.body)
-  if (error) {
-    let errMsg = error.details.map((el) => el.message).join(",")
-    throw new ExpressError(400, errMsg)
-  }
-  else {
-    next()
-  }
+const sessionOptions = {
+  secret: "mysupersecretcode",
+  resave: false,
+  saveUninitialized: true
 }
+// Home
 app.get("/", (req, res) => {
-  res.send("Hii, I am root.");
+  res.send("Hi, I am root.");
 });
 
-// index route
-app.get("/listings", async (req, res) => {
-  const allListings = await Listing.find({});
-  res.render("listing/index.ejs", { allListings });
-});
+app.use(session(sessionOptions))
+app.use(flash())
 
-
-
-// new route
-app.get("/listings/new", (req, res) => {
-  res.render("listing/new.ejs");
-});
-
-// show route
-app.get("/listings/:id", async (req, res) => {
-  let { id } = req.params;
-  const listing = await Listing.findById(id);
-  res.render("listing/show.ejs", { listing });
-});
-
-// create route
-app.post("/listings", validateListing, wrapAsync(async (req, res) => {
-  const { title, description, image, price, country, location } = req.body.listing;
-
-  const newListing = new Listing({
-    title,
-    description,
-    image,
-    price,
-    country,
-    location,
-  });
-  await newListing.save();
-  res.redirect("/listings");
-}));
-
-// edit route
-app.get("/listings/:id/edit", async (req, res) => {
-  let { id } = req.params;
-  const listing = await Listing.findById(id);
-  res.render("listing/edit.ejs", { listing });
-});
-
-// update route
-app.put("/listings/:id", validateListing, wrapAsync(async (req, res) => {
-  let { id } = req.params;
-  await Listing.findByIdAndUpdate(id, { ...req.body.listing });
-  res.redirect(`/listings/${id}`);
+app.use((req, res, next) => {
+  res.locals.success = req.flash("success")
+  next();
 })
-);
 
-// delete route
-app.delete("/listings/:id", async (req, res) => {
-  let { id } = req.params;
-  let deltetedListing = await Listing.findByIdAndDelete(id);
-  res.redirect("/listings");
-});
+// Routes
+app.use("/listings", listingRouter);
 
-// pages route
+app.use("/listings/:id/reviews", reviewRouter);
+
+// Static Pages
 app.get("/privacy", (req, res) => {
   res.render("pages/privacy");
 });
@@ -113,18 +63,22 @@ app.get("/terms", (req, res) => {
   res.render("pages/terms");
 });
 
+// 404
 app.all("/*splat", (req, res, next) => {
   next(new ExpressError(404, "Page Not Found!"));
 });
 
+// Error Handler
 app.use((err, req, res, next) => {
   if (err.name === "CastError") {
     err = new ExpressError(404, "Listing not found!");
   }
 
   let { statusCode = 500, message = "Something went wrong!" } = err;
+
   res.status(statusCode).render("listing/error.ejs", { message });
 });
+
 app.listen(3000, () => {
-  console.log("server is running on 3000 port");
+  console.log("Server is running on port 3000");
 });

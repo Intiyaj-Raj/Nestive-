@@ -5,6 +5,7 @@ body {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  background: rgb(208, 239, 250) !important;
 }
 .container {
   flex: 1;
@@ -51,7 +52,7 @@ body {
 
 /* cards */
 
-.card {
+.listing-card {
   border: none !important;
   margin-bottom: 2rem;
 }
@@ -95,6 +96,6 @@ body {
   display: flex;
 }
 .show-card {
-  padding-left: 0 !important;
-  padding-right: 0 !important;
+  padding: 10px 20px;
+  margin-bottom: 20px;
 }

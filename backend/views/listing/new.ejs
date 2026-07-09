@@ -3,49 +3,54 @@
   <div class="row">
     <div class="col-8 offset-2">
       <h3 class="text-center mb-5">Create a New Listing</h3>
+
       <form method="POST" action="/listings" class="needs-validation" novalidate>
+
         <div class="mb-3">
           <label for="title" class="form-label">Title</label>
-          <input class="form-control" type="text" name="title" placeholder="Add a catchy title" required />
-          <div class="valid-feedback">Title Looks Good</div>
-          <div class="invalid-feedback">please enter a title</div>
+          <input id="title" class="form-control" type="text" name="listing[title]" placeholder="Add a catchy title"
+            required />
+          <div class="valid-feedback">Title looks good!</div>
+          <div class="invalid-feedback">Please enter a title.</div>
         </div>
+
         <div class="mb-3">
           <label for="description" class="form-label">Description</label>
-          <textarea type="text" name="description" class="form-control" required></textarea>
-          <div class="invalid-feedback">please enter a short description</div>
+          <textarea id="description" class="form-control" name="listing[description]" rows="4" required></textarea>
+          <div class="invalid-feedback">Please enter a short description.</div>
         </div>
 
         <div class="mb-3">
           <label for="image" class="form-label">Image Link</label>
-          <input class="form-control" type="text" name="image" placeholder="enter image URL/Link" />
+          <input id="image" class="form-control" type="text" name="listing[image]" placeholder="Enter image URL" />
         </div>
 
         <div class="row">
           <div class="mb-3 col-md-4">
             <label for="price" class="form-label">Price</label>
-            <input class="form-control" type="number" name="price" placeholder="1200" required />
-            <div class="invalid-feedback">Price should be valid</div>
+            <input id="price" class="form-control" type="number" name="listing[price]" placeholder="1200" required />
+            <div class="invalid-feedback">Please enter a valid price.</div>
           </div>
 
           <div class="mb-3 col-md-8">
             <label for="country" class="form-label">Country</label>
-
-            <input class="form-control" type="text" name="country" placeholder="India" required />
-            <div class="invalid-feedback">Country name should be valid</div>
+            <input id="country" class="form-control" type="text" name="listing[country]" placeholder="India" required />
+            <div class="invalid-feedback">Please enter a country.</div>
           </div>
         </div>
+
         <div class="mb-3">
           <label for="location" class="form-label">Location</label>
-          <input class="form-control" type="text" name="location" placeholder="Indore, Madhya Pradesh 453500"
-            required />
-          <div class="invalid-feedback">Location should be valid</div>
+          <input id="location" class="form-control" type="text" name="listing[location]"
+            placeholder="Indore, Madhya Pradesh" required />
+          <div class="invalid-feedback">Please enter a location.</div>
         </div>
 
-        <button class="btn btn-dark add-btn">Add</button>
-        <br /><br />
+        <button type="submit" class="btn btn-dark add-btn">
+          Add Listing
+        </button>
+
+        <br><br>
       </form>
     </div>
   </div>
-
-  <script src="/js/script.js"></script>
