@@ -6,7 +6,6 @@ const Review = require("../models/reviews");
 const wrapAsync = require("../utils/wrapAsync");
 const ExpressError = require("../utils/ExpressError");
 const { listingSchema } = require("../schema");
-
 const validateListing = (req, res, next) => {
     let { error } = listingSchema.validate(req.body);
 
@@ -40,7 +39,10 @@ router.get(
         let { id } = req.params;
 
         const listing = await Listing.findById(id).populate("reviews");
-
+        if (!listing) {
+            req.flash("error", "Listing you requested for does not exist!")
+            res.redirect("/listings")
+        }
         res.render("listing/show.ejs", { listing });
     })
 );
